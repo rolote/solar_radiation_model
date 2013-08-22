@@ -1,0 +1,10 @@
+- Verificar que las funciones geométricas de Jaén funcionen adecuadamente.
+- Verificar excepción cuando se realiza self._ftp.quit().
+- Solucionar "Worker X has captured an exception:  'NoneType' object has no attribute 'sendall'" luego de detectar un stalled (verificar la detección de un stalled y el cancelamiento de la descarga).
+
+- Agregar los coeficientes de calibración para cada canal (siempre es un polinomio lineal de primer grado), teniendo en cuenta que cambian en el tiempo.
+- Crear filtro para transformar las cuentas digitales a radiancia (habría que crear una lista de coeficientes históricos por mes).
+
+- Crear un filtro que los agrupe por mes (tener en cuenta alguna futura configuración).
+- Agregar al AutomaticDownload, si el step es de día u hora (o "media hora", para algún paso de estimación en tiempo real).
+- Crear filtro que escale el tamaño de un canal (por ejemplo 2,3,4,6) para que tenga el mismo shape que otro (por ejemplo 1).

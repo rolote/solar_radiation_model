@@ -1,0 +1,102 @@
+IMAGE DOWNLOADER
+================
+
+The configuration of this service requires a lot of software installations. To simplify the deployment we offer a bash script that perform all the process on a fresh CentOS 6 system. You only need to execute the next line as *root*:
+
+# ./configure_env
+
+If you want to get your hands dirty, in the nexts sections we explain the main steps necesary to put this service to work.
+
+PREREQUISITE
+------------
+
+Before the installation you should install several things in order to obtain all the necesary libreries and external software.
+
+First you should install the EPEL repository, using these steps:
+
+# wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+# wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+# sudo rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
+
+Second you should install a python interpreter. In this project we used the python 2.7.3 version to avoid libraries problems on the server deployment process.
+
+If you are using a machine with CentOS 6, the necesary steps to setup *python* are:
+
+# yum groupinstall -y "Development tools"
+# yum install -y zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+# wget http://python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2
+# tar xf Python-2.7.3.tar.bz2
+# cd Python-2.7.3
+# ./configure --prefix=/usr/local
+# make && make altinstall
+
+Then you should install *pip*, but pip requires *distribute* to be installed. The steps to install *distribute* are:
+
+# wget http://pypi.python.org/packages/source/d/distribute/distribute-0.6.35.tar.gz
+# tar xf distribute-0.6.35.tar.gz
+# cd distribute-0.6.35
+# python2.7 setup.py install
+
+And then to install *pip*, the steps are:
+
+# curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+# python get-pip.py
+
+After the pip installation, you should install the postgresql database engine (we use the version 9.1), to do that the steps are:
+
+# curl -O http://yum.postgresql.org/9.1/redhat/rhel-6-i386/pgdg-centos91-9.1-4.noarch.rpm
+# rpm -ivh pgdg-centos91-9.1-4.noarch.rpm
+# yum install -y postgresql91-server postgresql91-devel postgresql91-libs
+# service postgresql-9.1 initdb
+# chkconfig postgresql-9.1 on
+# service postgresql-9.1 start
+
+Then, you should change the password of the 'postgre' user. To do so, execute:
+
+# patch /var/lib/pgsql/9.1/data/pg_hba.conf < pg_hba.conf.patch
+# chown postgres /var/lib/pgsql/9.1/data/pg_hba.conf
+# service postgresql-9.1 restart
+
+# psql -U postgres
+
+Then, when the psql prompt is active, the step is:
+
+> ALTER USER postgres WITH PASSWORD 'postgres';
+
+INSTALLATION
+------------
+
+First you should install the python libraries:
+
+# pip-2.7 install -r requirements.txt
+
+Then, deploy the database (create empty database, create tables, migrate to the last state) using the next line:
+
+# ./resetdb.sh
+
+When the console ask you for a user you should say *yes*, and complete with:
+
+user:    dev
+email:   <any real of fake email address>
+pass:    dev
+re-pass: dev
+
+RUNNING
+-------
+
+There are 2 things to run: the *frontend* and the *backend*. First we recommend you to run the *frontend* using the next steps:
+
+# python2.7 manage.py runserver 0.0.0.0:80
+
+Now you can go to a browser on the same machine and use the address "http://localhost/admin" to login to the service. Remember to use the previous data.
+
+Play a lot, and try to understand each part of the page.
+
+After that, when you are ready to start the *backend* (the download engine), you should use the next line:
+
+# python2.7 manage.py runbackend
+
+ABOUT
+-----
+
+This software is still being developed by GERSolar. If you have any questions or ideas email us to <gersolar.dev@gmail.com>.

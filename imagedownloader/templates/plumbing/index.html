@@ -1,0 +1,9 @@
+{% if program_list %}
+    <ul>
+    {% for program in program_list %}
+        <li><a href="/plumbing/execute/{{ program.id }}/">{{ program.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No programs are available.</p>
+{% endif %}

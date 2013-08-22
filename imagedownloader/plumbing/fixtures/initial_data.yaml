@@ -1,0 +1,95 @@
+- model: plumbing.process
+  pk: 1
+  fields:
+    name: 'Filter nights and compact'
+    description: 'Filter all images with solar elevation < 10 degrees.'
+    progress: '0.00'
+    executing: False
+
+- model: plumbing.complexprocess
+  pk: 1
+  fields: {}
+
+- model: plumbing.program
+  pk: 1
+  fields:
+    automatic_download: 3
+
+- model: plumbing.process
+  pk: 2
+  fields:
+    name: 'Save'
+    description: 'Compile all in a NetCDF4 file.'
+    progress: '0.00'
+    executing: False
+
+- model: plumbing.compact
+  pk: 2
+  fields:
+    extension: '.nc'
+
+- model: plumbing.process
+  pk: 3
+  fields:
+    name: 'All files'
+    description: 'Exclude .meta files from all files.'
+    progress: '0.00'
+    executing: False
+
+- model: plumbing.filterchannel
+  pk: 3
+  fields:
+    channels: [1,2,3,4,5]
+
+- model: plumbing.process
+  pk: 4
+  fields:
+    name: 'Channel classify'
+    description: 'Aggregate images by channel number'
+    progress: '0.00'
+    executing: False
+
+- model: plumbing.collectchannel
+  pk: 4
+  fields: {}
+
+- model: plumbing.process
+  pk: 5
+  fields:
+    name: 'Filter images from the night'
+    description: 'Only pass the images with a solar elevation >= 10 degrees.'
+    progress: '0.00'
+    executing: False
+
+- model: plumbing.filtersolarelevation
+  pk: 5
+  fields:
+    minimum: '10.00'
+
+- model: plumbing.processorder
+  pk: 1
+  fields:
+    position: 1
+    process: 3
+    complex_process: 1
+
+- model: plumbing.processorder
+  pk: 2
+  fields:
+    position: 2
+    process: 4
+    complex_process: 1
+
+- model: plumbing.processorder
+  pk: 3
+  fields:
+    position: 3
+    process: 5
+    complex_process: 1
+
+- model: plumbing.processorder
+  pk: 4
+  fields:
+    position: 4
+    process: 2
+    complex_process: 1

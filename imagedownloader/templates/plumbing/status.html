@@ -1,0 +1,12 @@
+<ul>
+{% for p in programs %}
+    <li>
+    {{ p.name }} is
+	{% if p.executing %}
+		at {{ p.progress }}%
+        {% else %}
+		stoped
+	{% endif %}.
+    </li>
+{% endfor %}
+</ul>

@@ -1,0 +1,78 @@
+#!/bin/bash
+
+export PATH=$PATH:/usr/local/bin
+export python=python2.7
+export pip=pip-2.7
+
+# configure EPEL repository
+
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+sudo rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
+sed "s/enabled\=0/enabled\=1/g" /etc/yum.repos.d/remi.repo > remi.repo
+mv -f remi.repo /etc/yum.repos.d/
+rm *.rpm
+
+# python
+
+yum groupinstall -y "Development tools"
+yum install -y zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+wget http://python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2
+tar xf Python-2.7.3.tar.bz2
+cd Python-2.7.3
+./configure --prefix=/usr/local
+make && make altinstall
+cd ..
+rm -rf Python-2.7.3*
+
+# pip
+
+wget http://pypi.python.org/packages/source/d/distribute/distribute-0.6.35.tar.gz
+tar xf distribute-0.6.35.tar.gz
+cd distribute-0.6.35
+$python setup.py install
+cd ..
+rm -rf distribute-0.6.35*
+curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+$python get-pip.py
+rm -rf get-pip.py build
+
+# postgresql
+curl -O http://yum.postgresql.org/9.1/redhat/rhel-6-i386/pgdg-centos91-9.1-4.noarch.rpm
+rpm -ivh pgdg-centos91-9.1-4.noarch.rpm
+rm *.rpm
+yum install -y postgresql91-server postgresql91-devel postgresql91-libs postgresql-devel
+service postgresql-9.1 initdb
+chkconfig postgresql-9.1 on
+service postgresql-9.1 start
+
+# change postgres password 
+sed "s/all[ \t]*peer/all trust/g" /var/lib/pgsql/9.1/data/pg_hba.conf > pg_hba.tmp.conf
+sed "s/ident/trust/g" pg_hba.tmp.conf > pg_hba.conf
+rm pg_hba.tmp.conf
+mv -f pg_hba.conf /var/lib/pgsql/9.1/data/pg_hba.conf
+chown postgres:postgres /var/lib/pgsql/9.1/data/pg_hba.conf
+service postgresql-9.1 restart
+
+user=postgres
+
+psql -U $user << EOF
+ALTER USER postgres WITH PASSWORD 'postgres';
+EOF
+
+# autoinstall all python requirements
+
+yum install -y firefox libXfont xorg-x11-fonts-* xorg-x11-server-Xvfb mesa-dri-drivers dbus-x11 hdf5-devel netcdf4-python netcdf-devel lapack lapack-devel blas blas-devel libxslt-devel libxslt
+dbus-uuidgen --ensure
+useradd xvfb
+chkconfig --add xvfb
+chkconfig xvfb on
+$pip install numpy
+$pip install -r requirements.txt
+
+# createdb
+
+./resetdb.sh
+
+iptables -I INPUT 3 -m state --state NEW -m tcp -p tcp --dport 8000 -j ACCEPT
+service iptables save

@@ -1,0 +1,4 @@
+*.nc
+*.zip
+*.py~
+libs/dem/all10/*
