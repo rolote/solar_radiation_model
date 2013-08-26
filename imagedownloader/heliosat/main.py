@@ -20,7 +20,7 @@ from libs.dem import dem
 import processgroundstations as pgs
 from libs.console import *
 
-SUB_LON = -60.0 # -75.3305 # longitude of sub-satellite point in degrees
+SAT_LON = -60.0 # -75.3305 # longitude of sub-satellite point in degrees
 GREENWICH_LON = 0.0
 IMAGE_PER_HOUR = 2
 
@@ -68,7 +68,7 @@ def process_temporal_data(lat, lon, root):
 	say("Projecting Linke's turbidity index... ")
 	linke.cut_projected(root)
 	say("Calculating the satellital zenith angle... ")
-	satellitalzenithangle = geo.getsatellitalzenithangle(lat, lon, SUB_LON)
+	satellitalzenithangle = geo.getsatellitalzenithangle(lat, lon, SAT_LON)
 	dem.cut_projected(root)
 	v_satellitalzenithangle = nc.getvar(root,'satellitalzenithangle', 'f4', ('northing','easting',),4)
 	v_satellitalzenithangle[:] = satellitalzenithangle
