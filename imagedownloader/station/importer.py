@@ -1,4 +1,5 @@
 import sys
+sys.path.append("../")
 from datetime import datetime, timedelta
 from xlrd import open_workbook
 import csv
@@ -14,20 +15,19 @@ def rows2csv(rows, filename):
 			
 def mvolt_to_watt(mvolt):
 	mvolt_per_kwatts_m2 = 8.48
-	return mvolt * mvolt_per_kwatts_m2 * 1000
+	return (mvolt / mvolt_per_kwatts_m2) * 1000
 
 def rows2slots(rows, image_per_hour):
 	resumed_slots = []
 	old_slot = geo.getslots(rows[0][0],image_per_hour)
 	seconds_in_slot = (rows[1][0] - rows[0][0]).total_seconds()
-	print seconds_in_slot
 	mvolt = 0
 	rows_by_slot = 0
 	dt = rows[0][0]
 	for r in rows:
 		slot = geo.getslots(dt,image_per_hour)
 		if not old_slot is slot:
-			resumed_slots.append([slot, [dt, mvolt_to_watt(mvolt/rows_by_slot/seconds_in_slot)]])
+			resumed_slots.append([slot, [dt, mvolt_to_watt((mvolt/rows_by_slot)/seconds_in_slot), rows_by_slot]])
 			old_slot, rows_by_slot, mvolt = slot, 0, 0
 		mvolt += r[1]
 		rows_by_slot += 1
@@ -62,7 +62,8 @@ def rows2netcdf(rows, filename, index):
 					i_m += 1
 				else:
 					value = instant_radiation[i_m][1][1]
-					measurements[i_e, index,:] = np.array([value, value])
+					row_in_slot = instant_radiation[i_m][1][2]
+					measurements[i_e, index,:] = np.array([value, row_in_slot])
 					i_e += 1
 					i_m += 1
 	nc.close(root)
