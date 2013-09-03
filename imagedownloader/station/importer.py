@@ -33,7 +33,7 @@ def rows2slots(rows, image_per_hour):
 		rows_by_slot += 1
 		dt = r[0]
 	if not old_slot is slot:
-		resumed_slots.append([slot, [dt, mvolt_to_watt(mvolt/rows_by_slot)/seconds_in_slot]])
+		resumed_slots.append([slot, [dt, mvolt_to_watt((mvolt/rows_by_slot)/seconds_in_slot), rows_by_slot]])
 		old_slot, rows_by_slot, mvolt = slot, 0, 0
 	return resumed_slots
 
@@ -63,9 +63,24 @@ def rows2netcdf(rows, filename, index):
 				else:
 					value = instant_radiation[i_m][1][1]
 					row_in_slot = instant_radiation[i_m][1][2]
-					measurements[i_e, index,:] = np.array([value, row_in_slot])
+					measurements[i_e, index,:] = np.array([value, value])
 					i_e += 1
 					i_m += 1
+	days = [ t.date() for t in times ]
+	nc.getdim(root, 'diarying')
+	diary_error = nc.getvar(root, 'diaryerror', 'f4', ('diarying', 'northing', 'easting'))
+	estimated = nc.getvar(root, 'globalradiation')[:]
+	error_diff = nc.getvar(root, 'errordiff', 'f4', ('timing','northing','easting'), 4)
+	error = nc.getvar(root, 'error', 'f4', ('timing','northing','easting'), 4)
+	error_diff[:, index, :] = measurements[:,index,:] - estimated[:,index,:]
+	error[:, index, :] = np.sqrt((error_diff[:, index, :])**2)
+	print error_diff.shape
+	nc.sync(root)
+	for	i in range(len(days)):
+		d = days[i].day
+		print index, i, d, error_diff[i,index], diary_error[d, index]
+		diary_error[d, index,:] += error_diff[i,index,:]
+	diary_error[:, index,:] = np.sqrt((diary_error[:, index,:])**2)
 	nc.close(root)
 
 def get_val(sh,x,y):
