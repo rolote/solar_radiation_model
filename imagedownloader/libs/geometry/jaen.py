@@ -267,7 +267,7 @@ def getsatellitalzenithangle(lat, lon, sub_lon):
 	result = None
 	rpol = 6356.5838
 	req = 6378.1690
-	h = 42164.0
+	h = 42166.55637 # 42164.0
 	if cuda_can_help:
 		func = mod_getsatellitalzenithangle.get_function("getsatellitalzenithangle")
 		lat = gpu._gpu_exec(func, lat, lon, sub_lon, rpol, req, h)
