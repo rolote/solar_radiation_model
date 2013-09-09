@@ -71,7 +71,7 @@ EOF
 
 # autoinstall all python requirements
 
-yum install -y firefox libXfont xorg-x11-fonts-* xorg-x11-server-Xvfb mesa-dri-drivers dbus-x11 hdf5-devel netcdf4-python netcdf-devel lapack lapack-devel blas blas-devel libxslt-devel libxslt
+yum install -y firefox libXfont xorg-x11-fonts-* xorg-x11-server-Xvfb mesa-dri-drivers dbus-x11 hdf5-devel netcdf4-python netcdf-devel lapack lapack-devel blas blas-devel libxslt-devel libxslt espeak-devel espeak screen
 dbus-uuidgen --ensure
 useradd xvfb
 chkconfig --add xvfb
