@@ -2,9 +2,10 @@
 
 user=postgres
 dbname="imagedownloader"
+python=/usr/local/bin/python2.7
 
 dropdb $dbname -U $user
 createdb  $dbname -U $user
 
-python2.7 manage.py syncdb
-python2.7 manage.py migrate
+$python manage.py syncdb
+$python manage.py migrate
