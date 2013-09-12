@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export PATH=$PATH:/usr/local/bin
-export python=python2.7
-export pip=pip-2.7
+export python=/usr/local/bin/python2.7
+export pip=/usr/local/bin/pip-2.7
 
 # configure EPEL repository
 
